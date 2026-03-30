@@ -1,7 +1,7 @@
 
 ## 1. Solution Overview
 
-This solution provides a centralized, scalable logging pipeline using **Grafana Loki** as the storage engine, backed by **Amazon S3**. It captures logs from three distinct sources:
+This solution provides a centralized, scalable logging pipeline using **Grafana Loki** as the storage engine, backed by **Amazon S3**. It captures logs from four distinct sources:
 
 1.  **EKS Clusters:** Via Fluent Bit DaemonSets.
     
@@ -49,7 +49,7 @@ Unlike standard IAM roles, Loki uses **IRSA**.
 
 Logs are stored in a bucket named `loki-storage-<ACCOUNT_ID>`.
 
--   **TSDB Indexing:** Uses the modern `v13` schema (ships with Loki 3.x/6.x) which is optimized for S3 performance.
+-   **TSDB Indexing:** Uses the `v13` schema (ships with Loki 3.x/6.x) which is optimized for S3 performance.
     
 -   **Retention:** A 30-day lifecycle policy is enforced at the S3 bucket level to control costs automatically.
     
@@ -68,7 +68,7 @@ For servers outside AWS, the architecture mirrors the EC2 setup but requires a s
 
 -   **Connectivity:** External servers must have a route to the VPC (VPN) OR the **Loki Gateway** must be exposed via a **Public Network Load Balancer (NLB)**.
     
--   **Authentication:** Unlike IRSA (which is automatic), external servers should use **Basic Auth** or **Header-based Authentication** configured at the Nginx Gateway level to ensure only authorized logs are ingested.
+-   **Authentication:** Unlike IRSA, external servers should use **Basic Auth** or **Header-based Authentication** configured at the Gateway level to ensure only authorized logs are ingested.
 
 ----------
 
@@ -105,7 +105,7 @@ For servers outside AWS, the architecture mirrors the EC2 setup but requires a s
 
 ### What is Missing for "Production" (Beyond PoC)
 
-While the PoC is solid, moving to 5TB/day in production would most likely require adding these three components:
+Moving to 5TB/day in production would most likely require adding these components:
 
 1.  **Caching (Memcached/Redis):** To make queries for 5TB of data fast, we will eventually want to add a caching layer for the index and result sets.
     
