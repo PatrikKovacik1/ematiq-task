@@ -1,0 +1,51 @@
+kind: DaemonSet
+
+config:
+  service: |
+    [SERVICE]
+        Flush        1
+        Daemon       Off
+        Log_Level    info
+        Parsers_File parsers.conf
+        storage.path /var/log/fluent-bit/buffer
+        storage.sync normal
+        storage.checksum off
+        storage.backlog.mem_limit 50M
+
+  inputs: |
+    [INPUT]
+        Name                tail
+        Path                /var/log/containers/*.log
+        multiline.parser    docker, cri
+        Tag                 kube.*
+        Mem_Buf_Limit       50MB
+        Skip_Long_Lines     On
+        storage.type        filesystem
+
+  filters: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Merge_Log           On
+        Keep_Log            Off
+        Labels              On
+        Annotations         Off
+
+  outputs: |
+    [OUTPUT]
+        Name        loki
+        Match       *
+        Host        loki-gateway.logging.svc.cluster.local
+        Port        3100
+        Labels      job=fluent-bit
+        Auto_Kubernetes_Labels on
+        Line_Format json
+        LogLevel    info
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
