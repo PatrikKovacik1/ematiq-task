@@ -14,7 +14,7 @@ resource "helm_release" "loki" {
 
   values = [
     templatefile("${path.module}/loki.yaml", {
-      loki_role_arn = aws_iam_role.loki_s3_role.arn
+      loki_role_arn = aws_iam_role.loki_s3.arn
       account_id    = data.aws_caller_identity.current.account_id
     })
   ]
@@ -27,7 +27,7 @@ resource "kubernetes_service_account" "loki" {
     name      = "loki"
     namespace = "logging"
     annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.loki_s3_role.arn
+      "eks.amazonaws.com/role-arn" = aws_iam_role.loki_s3.arn
     }
   }
 }
@@ -49,10 +49,10 @@ resource "helm_release" "grafana" {
 # Fluent Bit
 
 resource "helm_release" "fluent_bit" {
-  name             = "fluent-bit"
-  repository       = "https://fluent.github.io/helm-charts"
-  chart            = "fluent-bit"
-  namespace        = kubernetes_namespace.logging.metadata[0].name
+  name       = "fluent-bit"
+  repository = "https://fluent.github.io/helm-charts"
+  chart      = "fluent-bit"
+  namespace  = kubernetes_namespace.logging.metadata[0].name
 
   values = [
     file("${path.module}/fluentbit.yaml")

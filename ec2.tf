@@ -1,5 +1,4 @@
 locals {
-  # We use a heredoc template here
   ec2_user_data = <<-EOF
     #!/bin/bash
     # 1. Install Fluent Bit
@@ -58,11 +57,7 @@ locals {
 resource "aws_instance" "example_ec2" {
   ami                  = "ami-0c55b159cbfafe1f0"
   instance_type        = "t3.medium"
-  iam_instance_profile = aws_iam_instance_profile.ec2_logging_role.name
+  iam_instance_profile = aws_iam_instance_profile.ec2_loki.name
 
   user_data = local.ec2_user_data
-
-  tags = {
-    Name = "Web-Server-Logging"
-  }
 }

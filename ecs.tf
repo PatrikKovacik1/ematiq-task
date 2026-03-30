@@ -1,11 +1,11 @@
-resource "aws_ecs_task_definition" "app_task" {
-  family                   = "my-app"
+resource "aws_ecs_task_definition" "example_ecs" {
+  family                   = "app"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_loki.arn
+  execution_role_arn       = aws_iam_role.ecs_execution_loki.arn
 
   container_definitions = jsonencode([
     {
